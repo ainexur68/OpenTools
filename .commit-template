@@ -1,0 +1,31 @@
+# 📝 Commit Message Template for OpenTools
+#
+# 使用方式：
+#   git commit 会自动加载本模板（因为 prepare-commit-msg 钩子）
+#
+# 填写说明：
+#   TYPE: feat / fix / chore / docs / refactor / style / perf
+#   SCOPE: 例如 base64 / autoscan / dark-mode / init
+#
+# 示例：
+# feat(base64): add Base64 tool
+#
+# 👇 按以下结构填写 👇
+
+TYPE(SCOPE): SHORT_DESCRIPTION
+
+## Prompt
+<写入你发送给 AI 的 Prompt 内容>
+
+## Script Generated
+<对应生成的脚本文件，例如 scripts/init-opentools.sh>
+
+## Summary
+- 本次更新包含哪些内容？
+- 哪些文件发生了变更？
+- 有什么注意事项？
+
+## Remarks (可选)
+- 其他补充说明
+- 依赖的步骤
+
