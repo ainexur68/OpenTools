@@ -6,6 +6,7 @@
 // Vite + TypeScript 图标映射
 
 export const toolIcons = {
+  "date-diff": new URL("../../assets/tool-icons/date-diff.svg", import.meta.url).href,
 } as const;
 
 export type ToolIdWithIcon = keyof typeof toolIcons;
