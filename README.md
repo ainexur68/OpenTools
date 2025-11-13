@@ -122,6 +122,7 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 │   └── styles/
 │       └── global.css              # 全局样式（含 Tailwind 基础引入）
 └── ...
+```
 5. 工具模块规范
 5.1 模块目录与命名
 
