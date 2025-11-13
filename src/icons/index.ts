@@ -3,10 +3,8 @@
  * 重新执行脚本会覆盖此文件。
  */
 
-// Vite + TypeScript 图标映射
-
 export const toolIcons = {
-  "date-diff": new URL("../../assets/tool-icons/date-diff.svg", import.meta.url).href,
+  "date-diff": new URL("./tool/date-diff.svg", import.meta.url).href,
 } as const;
 
 export type ToolIdWithIcon = keyof typeof toolIcons;
