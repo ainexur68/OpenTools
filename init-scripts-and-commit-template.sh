@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
 
-echo "🛠 Initializing scripts directory + commit message template..."
+echo "🛠 Initializing script directory + commit message template..."
 
 ############################################
-# 1. 创建 scripts/ 目录
+# 1. 创建 script/ 目录
 ############################################
-mkdir -p scripts
-echo "📁 Created scripts/ directory."
+mkdir -p script
+chmod +x script/*.sh 2>/dev/null || true
+echo "📁 Ensured script/ directory exists."
 
 ############################################
 # 2. 创建 .commit-template（Git Commit 模板）
@@ -33,7 +34,7 @@ TYPE(SCOPE): SHORT_DESCRIPTION
 <写入你发送给 AI 的 Prompt 内容>
 
 ## Script Generated
-<对应生成的脚本文件，例如 scripts/init-opentools.sh>
+<对应生成的脚本文件，例如 script/create-tool.sh>
 
 ## Summary
 - 本次更新包含哪些内容？
@@ -56,15 +57,12 @@ mkdir -p .git/hooks
 cat > .git/hooks/prepare-commit-msg <<'EOF'
 #!/bin/bash
 
-# Only apply template for manually created commit messages (message file exists)
 MSG_FILE=$1
 
-# If commit message already has content, do not override
 if [ -s "$MSG_FILE" ]; then
   exit 0
 fi
 
-# Append commit template
 cat .commit-template >> "$MSG_FILE"
 EOF
 
@@ -88,9 +86,16 @@ OpenTools 的开发完全采用 **AI 辅助开发流程**。
 
 每个 commit 都包含：
 
-- 你发送给 AI 的 Prompt  
-- AI 返回的脚本文件位置  
-- 本次变更的 Summary 说明  
+- 你发送给 AI 的 Prompt
+- AI 返回的脚本文件位置
+- 本次变更的 Summary 说明
 
 所有自动生成脚本统一存放在：
 
+- `script/` —— 当前可执行脚本
+- `scripts/` —— 历史脚本归档（可选）
+
+EOF
+fi
+
+echo "✅ Initialization complete."
