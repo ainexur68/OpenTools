@@ -1,3 +1,59 @@
+#!/usr/bin/env bash
+# script/extend-opentools.sh
+# 为 OpenTools apps/web 追加：
+# - 主题切换（暗黑 / 亮色）
+# - 首页卡片式 UI
+#
+# 仅改写 src/App.tsx，不安装依赖。
+# 兼容 Node 18.19.1 / npm 9.2.0。
+
+set -euo pipefail
+
+# -------------------------
+# 工具函数
+# -------------------------
+
+backup_file() {
+  local file="$1"
+  if [ -f "$file" ]; then
+    local backup="${file}.bak.$(date +%Y%m%d-%H%M%S)"
+    echo "📦 Backup $file -> $backup"
+    mv "$file" "$backup"
+  fi
+}
+
+# -------------------------
+# 路径计算
+# -------------------------
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+APP_DIR="${ROOT_DIR}/apps/web"
+SRC_DIR="${APP_DIR}/src"
+
+echo "🚀 OpenTools extend (theme + home cards)"
+echo "   ROOT_DIR = ${ROOT_DIR}"
+echo "   APP_DIR  = ${APP_DIR}"
+echo
+
+if [ ! -d "${APP_DIR}" ]; then
+  echo "❌ apps/web not found. Please run your init-opentools script first." >&2
+  exit 1
+fi
+
+mkdir -p "${SRC_DIR}"
+
+# -------------------------
+# 备份旧 App.tsx
+# -------------------------
+
+backup_file "${SRC_DIR}/App.tsx"
+
+# -------------------------
+# 写入新的 App.tsx
+# -------------------------
+
+cat <<'EOF' > "${SRC_DIR}/App.tsx"
 import React, { useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
@@ -157,3 +213,11 @@ const App: React.FC = () => {
 };
 
 export default App;
+EOF
+
+echo
+echo "✅ src/App.tsx updated with theme toggle & home cards."
+echo "👉 Next steps:"
+echo "   cd apps/web"
+echo "   npm run dev"
+echo
