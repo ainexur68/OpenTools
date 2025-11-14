@@ -72,55 +72,62 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 ```bash
 .
 ├── README.md
-├── index.html
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── .editorconfig
-├── .gitignore
-├── .npmrc
-├── script/                         # 所有脚本统一放在此目录
-│   ├── init-opentools.sh           # 初始化 OpenTools 项目
-│   ├── extend-opentools.sh         # 扩展主题 / 首页 UI 卡片等
-│   ├── create-tool.sh              # 新建工具模块的模板脚本
-│   ├── extend-icons.sh             # 自动生成 / 扩展工具图标
-│   ├── init-scripts.sh             # 脚本目录初始化（可选）
-│   └── ...                         # 其他辅助脚本
-├── scripts/                        # （可选）历史脚本文本归档，与 script/ 区分
-├── src/
-│   ├── main.tsx                    # 应用入口
-│   ├── App.tsx                     # 路由与布局
-│   ├── router/                     # 路由配置
-│   │   └── index.tsx
-│   ├── layout/
-│   │   ├── RootLayout.tsx          # 顶层布局（含主题切换等）
-│   │   └── ToolLayout.tsx          # 工具页面布局
+├── LICENSE
+├── init-scripts-and-commit-template.sh   # 初始化脚本与 commit 模板合集
+├── apps/
+│   └── web/                              # 实际运行的 Vite + React 前端项目
+│       ├── index.html
+│       ├── package.json
+│       ├── package-lock.json
+│       ├── postcss.config.cjs
+│       ├── tailwind.config.cjs
+│       ├── tsconfig.json
+│       ├── vite.config.ts
+│       └── src/
+│           ├── main.tsx                  # Web 入口文件
+│           ├── App.tsx                   # 注入主题 / 路由
+│           ├── index.css                 # Web 侧全局样式
+│           └── vite-env.d.ts
+├── script/                               # 所有自动化脚本
+│   ├── init-opentools.sh                 # 初始化 OpenTools 仓库
+│   ├── extend-opentools.sh               # 扩展主题 / 首页布局
+│   ├── create-tool.sh                    # 新建工具模块模板
+│   └── extend-icons.sh                   # 批量生成 / 扩展工具图标
+├── scripts/                              # （可选）历史脚本归档，与 script/ 区分
+├── src/                                  # 共享的工具系统源码
 │   ├── components/
-│   │   ├── ThemeToggle.tsx         # 主题切换按钮
-│   │   ├── ToolCard.tsx            # 首页工具卡片
-│   │   ├── ToolIcon.tsx            # 工具图标组件
-│   │   └── ...
-│   ├── tools/                      # 所有工具模块的根目录
-│   │   ├── calculator/             # 示例：计算器工具
-│   │   │   ├── index.tsx           # 工具主组件
-│   │   │   ├── config.ts           # 工具元数据（id、名称、图标等）
-│   │   │   ├── types.ts            # 类型定义（可选）
-│   │   │   └── utils.ts            # 工具内部逻辑（可选）
-│   │   ├── hash/                   # 示例：哈希计算工具
-│   │   └── ...
+│   │   ├── ThemeToggle.tsx               # 主题切换按钮
+│   │   ├── ToolCard.tsx                  # 首页工具卡片
+│   │   └── ToolIcon.tsx                  # 工具图标组件
 │   ├── core/
-│   │   ├── registry/               # 工具自动注册相关
-│   │   │   ├── toolRegistry.ts     # 自动扫描 + 注册逻辑
-│   │   │   └── toolTypes.ts        # 工具公共类型定义
-│   │   ├── theme/                  # 主题切换逻辑
-│   │   │   ├── themeContext.tsx
-│   │   │   └── useTheme.ts
-│   │   └── store/                  # 全局状态（如需要）
-│   ├── icons/                      # 统一的图标资源目录
-│   │   ├── index.ts                # 图标导出入口
-│   │   └── tool/                   # 每个工具使用的图标文件（SVG/TSX）
-│   └── styles/
-│       └── global.css              # 全局样式（含 Tailwind 基础引入）
+│   │   ├── registry/                     # 工具自动注册逻辑
+│   │   │   ├── toolRegistry.ts
+│   │   │   └── toolTypes.ts
+│   │   └── theme/                        # 主题上下文 / Hooks
+│   │       ├── themeContext.tsx
+│   │       └── useTheme.ts
+│   ├── icons/
+│   │   ├── index.ts                      # 图标导出入口
+│   │   └── tool/
+│   │       └── date-diff.svg             # 工具图标示例
+│   ├── layout/
+│   │   ├── RootLayout.tsx                # 顶层布局（含主题切换等）
+│   │   └── ToolLayout.tsx                # 工具页面布局
+│   ├── pages/
+│   │   └── Home.tsx                      # 首页
+│   ├── router/
+│   │   └── index.tsx                     # 路由配置
+│   └── tools/
+│       ├── calculator/
+│       │   ├── config.ts                 # 工具元数据
+│       │   └── index.tsx                 # 工具主组件
+│       ├── date-diff/
+│       │   ├── config.ts                 # 工具元数据
+│       │   └── index.tsx                 # 工具主组件
+│       └── hash-calculator/
+│           ├── config.ts                 # 工具元数据
+│           ├── index.tsx                 # 工具主组件
+│           └── utils.ts                  # 哈希算法实现
 └── ...
 ```
 ## 5. 工具模块规范
@@ -128,14 +135,14 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 ### 5.1 模块目录与命名
 
 - 每个工具是 `src/tools/<tool-id>/` 下的独立目录。
-- `<tool-id>` 使用 kebab-case，例如 `date-diff`、`hash-generator`、`geo-coordinate-convert`。
+- `<tool-id>` 使用 kebab-case，例如 `date-diff`、`hash-calculator`、`geo-coordinate-convert`。
 
 ### 5.2 工具基础文件
 
-以 `src/tools/hash-generator/` 为例：
+以 `src/tools/hash-calculator/` 为例：
 
 ```text
-src/tools/hash-generator/
+src/tools/hash-calculator/
 ├── index.tsx       # 工具主组件
 ├── config.ts       # 工具元数据
 ├── types.ts        # 工具特有类型定义（可选）
@@ -145,16 +152,16 @@ src/tools/hash-generator/
 **`config.ts` 示例**
 
 ```ts
-// src/tools/hash-generator/config.ts
+// src/tools/hash-calculator/config.ts
 import type { ToolMeta } from "@/core/registry/toolTypes";
 
-export const hashGeneratorMeta: ToolMeta = {
-  id: "hash-generator",
+export const hashCalculatorMeta: ToolMeta = {
+  id: "hash-calculator",
   name: "哈希计算器",
   description: "输入任意文本，计算 MD5 / SHA 系列哈希值。",
   category: "编码与安全",
-  route: "/tools/hash-generator",
-  icon: "hash", // 对应图标系统中的 key
+  route: "/tools/hash-calculator",
+  icon: "hash-calculator", // 对应图标系统中的 key
   keywords: ["hash", "md5", "sha", "加密", "摘要"],
   order: 10,
 };
@@ -163,10 +170,10 @@ export const hashGeneratorMeta: ToolMeta = {
 **`index.tsx` 示例**
 
 ```tsx
-// src/tools/hash-generator/index.tsx
+// src/tools/hash-calculator/index.tsx
 import React, { useState } from "react";
 
-export const HashGenerator: React.FC = () => {
+export const HashCalculator: React.FC = () => {
   const [input, setInput] = useState("");
   const [md5, setMd5] = useState("");
   const [sha1, setSha1] = useState("");
@@ -289,7 +296,7 @@ src/icons/
 ├── index.ts               # 统一导出
 ├── tool/
 │   ├── calculator.svg
-│   ├── hash.svg
+│   ├── hash-calculator.svg
 │   ├── date-diff.svg
 │   └── ...
 └── ...
@@ -301,7 +308,7 @@ src/icons/
 // src/icons/index.ts
 export const toolIcons: Record<string, string> = {
   calculator: "/src/icons/tool/calculator.svg",
-  hash: "/src/icons/tool/hash.svg",
+  "hash-calculator": "/src/icons/tool/hash-calculator.svg",
   "date-diff": "/src/icons/tool/date-diff.svg",
   // ...
 };
