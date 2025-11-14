@@ -18,7 +18,9 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["../../src/*"],
-      "#app/*": ["src/*"]
+      "#app/*": ["src/*"],
+      "react-router-dom": ["../../src/vendor/react-router-dom"],
+      "react-router-dom/*": ["../../src/vendor/react-router-dom/*"]
     }
   },
   "include": ["src", "../../src"]
