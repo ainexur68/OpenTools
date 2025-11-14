@@ -1,12 +1,12 @@
 import React from "react";
-import { toolIcons } from "@/assets/icons";
+import { getToolIcon } from "@/assets/icons";
 
 export interface ToolIconProps extends React.ComponentPropsWithoutRef<"img"> {
   readonly name: string;
 }
 
 export const ToolIcon: React.FC<ToolIconProps> = ({ name, className, alt, ...rest }) => {
-  const src = toolIcons[name];
+  const src = getToolIcon(name);
 
   if (!src) {
     return (

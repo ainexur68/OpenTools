@@ -123,7 +123,8 @@ export const computeHash = async (algorithm: SupportedHashAlgorithm, message: st
 
 export const initialHashResult = <T extends readonly SupportedHashAlgorithm[]>(algorithms: T) => {
   return algorithms.reduce<Record<T[number], string>>((acc, item) => {
-    acc[item] = "";
+    const key = item as T[number];
+    acc[key] = "";
     return acc;
   }, {} as Record<T[number], string>);
 };

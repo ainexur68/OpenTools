@@ -1,5 +1,5 @@
 /*
- * 此文件由 script/extend-icons.sh 自动生成，请不要手动修改。
+ * 此文件由 scripts/extend-icons.sh 自动生成，请不要手动修改。
  * 重新执行脚本会覆盖此文件。
  */
 

@@ -35,6 +35,6 @@ vite.config.ts.timestamp*
 
 # ---- OpenTools Specific ----
 # 自动扫描生成的工具元数据（未来保留）
-tools/.generated/
+src/features/tools/modules/.generated/
 **/cache/
 **/.tool-cache/

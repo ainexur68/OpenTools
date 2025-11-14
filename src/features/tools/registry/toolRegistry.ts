@@ -10,7 +10,7 @@ const metaModules = import.meta.glob<ToolMetaModule>("../modules/**/meta.ts", {
   eager: true
 });
 
-const componentModules = import.meta.glob<() => Promise<ToolComponentModule>>("../modules/**/index.tsx");
+const componentModules = import.meta.glob<ToolComponentModule>("../modules/**/index.tsx");
 
 const toEntry = ([modulePath, mod]: [string, ToolMetaModule]): ToolRegistryEntry | null => {
   const meta = mod.toolMeta ?? mod.default ?? mod.meta;
