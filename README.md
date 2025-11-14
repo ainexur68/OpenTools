@@ -46,8 +46,8 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 - 🔎 **自动扫描注册系统**：通过文件约定 + Vite 动态导入自动收集工具信息；
 - 🎨 **暗黑模式**：内置主题切换（Light / Dark），状态持久化（localStorage）；
 - 📱 **响应式 UI**：首页卡片布局，自动适配 PC / 平板 / 手机；
-- ⚙️ **脚本驱动开发**：所有脚本放在 `script/` 下，可一键初始化 / 一键生成工具 / 一键更新图标；
-- 🧠 **AI 历史系统规划**：将项目的设计对话、脚本生成过程归档到仓库中，作为项目的独特亮点。
+- ⚙️ **脚本驱动开发**：所有脚本放在 `scripts/` 下，可一键初始化 / 一键生成工具 / 一键更新图标；
+- 🧱 **纯工具定位**：仓库仅包含工具、公共模块、脚本与图标系统等模块。
 
 ## 3. 技术栈与运行环境
 
@@ -75,82 +75,56 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 .
 ├── README.md
 ├── LICENSE
-├── init-scripts-and-commit-template.sh   # 初始化脚本与 commit 模板合集
-├── apps/
-│   └── web/                              # 实际运行的 Vite + React 前端项目
-│       ├── index.html
-│       ├── package.json
-│       ├── package-lock.json
-│       ├── postcss.config.cjs
-│       ├── tailwind.config.cjs
-│       ├── tsconfig.json
-│       ├── vite.config.ts
-│       └── src/
-│           ├── main.tsx                  # Web 入口文件
-│           ├── App.tsx                   # 注入主题 / 路由
-│           ├── index.css                 # Web 侧全局样式
-│           └── vite-env.d.ts
-├── script/                               # 所有自动化脚本
-│   ├── init-opentools.sh                 # 初始化 OpenTools 仓库
-│   ├── extend-opentools.sh               # 扩展主题 / 首页布局
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+├── vite.config.ts
+├── tailwind.config.ts
+├── postcss.config.cjs
+├── index.html
+├── init-scripts-and-commit-template.sh   # 初始化脚本与 commit 模板
+├── scripts/                              # 所有自动化脚本
 │   ├── create-tool.sh                    # 新建工具模块模板
-│   └── extend-icons.sh                   # 批量生成 / 扩展工具图标
-├── scripts/                              # （可选）历史脚本归档，与 script/ 区分
-├── src/                                  # 共享的工具系统源码
-│   ├── components/
-│   │   ├── ThemeToggle.tsx               # 主题切换按钮
-│   │   ├── ToolCard.tsx                  # 首页工具卡片
-│   │   └── ToolIcon.tsx                  # 工具图标组件
-│   ├── core/
-│   │   ├── registry/                     # 工具自动注册逻辑
-│   │   │   ├── toolRegistry.ts
-│   │   │   └── toolTypes.ts
+│   ├── extend-icons.sh                   # 批量生成 / 扩展工具图标
+│   └── install-deps.sh                   # 一键安装依赖
+├── src/
+│   ├── main.tsx                          # 应用入口
+│   ├── styles/tailwind.css               # 全局样式入口
+│   ├── app/
+│   │   ├── App.tsx
+│   │   └── router/
+│   │       └── index.tsx
+│   ├── layouts/
+│   │   └── RootLayout.tsx
+│   ├── shared/
+│   │   ├── components/                   # 通用 UI 组件（如 ThemeToggle）
 │   │   └── theme/                        # 主题上下文 / Hooks
-│   │       ├── themeContext.tsx
-│   │       └── useTheme.ts
-│   ├── icons/
-│   │   ├── index.ts                      # 图标导出入口
-│   │   └── tool/
-│   │       └── date-diff.svg             # 工具图标示例
-│   ├── layout/
-│   │   ├── RootLayout.tsx                # 顶层布局（含主题切换等）
-│   │   └── ToolLayout.tsx                # 工具页面布局
-│   ├── pages/
-│   │   └── Home.tsx                      # 首页
-│   ├── router/
-│   │   └── index.tsx                     # 路由配置
-│   └── tools/
-│       ├── calculator/
-│       │   ├── index.tsx                 # 工具主组件
-│       │   ├── logic.ts                  # 业务逻辑 / 纯函数
-│       │   └── meta.ts                   # 工具元数据
-│       ├── date-diff/
-│       │   ├── index.tsx
-│       │   ├── logic.ts
-│       │   └── meta.ts
-│       ├── dependency-checker/
-│       │   ├── index.tsx
-│       │   ├── logic.ts
-│       │   └── meta.ts
-│       └── hash-calculator/
-│           ├── index.tsx
-│           ├── logic.ts
-│           └── meta.ts
+│   ├── assets/
+│   │   └── icons/
+│   │       ├── index.ts                  # 图标导出入口（自动生成）
+│   │       └── tools/*.svg               # 工具 SVG 图标
+│   └── features/
+│       └── tools/
+│           ├── components/               # ToolCard / ToolIcon 等
+│           ├── layouts/                  # ToolLayout
+│           ├── pages/                    # ToolHub（首页）
+│           ├── registry/                 # 自动注册逻辑
+│           └── modules/                  # 各工具模块（react 组件 + meta + 逻辑）
 └── ...
 ```
 ## 5. 工具模块规范
 
 ### 5.1 模块目录与命名
 
-- 每个工具是 `src/tools/<tool-id>/` 下的独立目录。
+- 每个工具是 `src/features/tools/modules/<tool-id>/` 下的独立目录。
 - `<tool-id>` 使用 kebab-case，例如 `date-diff`、`hash-calculator`、`geo-coordinate-convert`。
 
 ### 5.2 工具基础文件
 
-以 `src/tools/hash-calculator/` 为例：
+以 `src/features/tools/modules/hash-calculator/` 为例：
 
 ```text
-src/tools/hash-calculator/
+src/features/tools/modules/hash-calculator/
 ├── index.tsx       # 工具主组件（只负责 UI）
 ├── logic.ts        # 核心逻辑（纯函数，便于复用与测试）
 ├── meta.ts         # 工具元数据（被自动注册系统读取）
@@ -160,7 +134,7 @@ src/tools/hash-calculator/
 **`meta.ts` 示例**
 
 ```ts
-// src/tools/hash-calculator/meta.ts
+// src/features/tools/modules/hash-calculator/meta.ts
 import type { ToolMeta } from "@/features/tools/registry/toolTypes";
 
 export const toolId = "hash-calculator" as const;
@@ -182,7 +156,7 @@ export default toolMeta;
 **`logic.ts` 示例**
 
 ```ts
-// src/tools/hash-calculator/logic.ts
+// src/features/tools/modules/hash-calculator/logic.ts
 export type SupportedHashAlgorithm = "MD5" | "SHA-1" | "SHA-256";
 
 export const initialHashResult = <T extends readonly SupportedHashAlgorithm[]>(algorithms: T) => {
@@ -210,7 +184,7 @@ export const computeHash = async (algorithm: SupportedHashAlgorithm, message: st
 **`index.tsx` 示例**
 
 ```tsx
-// src/tools/hash-calculator/index.tsx
+// src/features/tools/modules/hash-calculator/index.tsx
 import React, { useState } from "react";
 
 export const HashCalculator: React.FC = () => {
@@ -282,11 +256,11 @@ export interface ToolMeta {
 import type { ToolMeta } from "./toolTypes";
 
 const metaModules = import.meta.glob<{ default?: ToolMeta; toolMeta?: ToolMeta }>(
-  "/src/tools/**/meta.ts",
+  "/src/features/tools/modules/**/meta.ts",
   { eager: true }
 );
 
-const componentModules = import.meta.glob("/src/tools/**/index.tsx");
+const componentModules = import.meta.glob("/src/features/tools/modules/**/index.tsx");
 
 export const toolMetaList: ToolMeta[] = Object.values(metaModules)
   .map((mod) => mod.toolMeta ?? mod.default)
@@ -301,12 +275,12 @@ export const toolComponents = componentModules;
 ### 6.3 在首页使用工具列表
 
 ```tsx
-// src/pages/Home.tsx
+// src/features/tools/pages/ToolHub.tsx
 import React from "react";
 import { toolMetaList } from "@/features/tools/registry/toolRegistry";
-import { ToolCard } from "@/components/ToolCard";
+import { ToolCard } from "@/features/tools/components/ToolCard";
 
-export const Home: React.FC = () => {
+export const ToolHubPage: React.FC = () => {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {toolMetaList.map((tool) => (
@@ -328,32 +302,30 @@ export const Home: React.FC = () => {
 ### 7.2 目录结构
 
 ```text
-src/icons/
-├── index.ts               # 统一导出
-├── tool/
-│   ├── calculator.svg
-│   ├── hash-calculator.svg
-│   ├── date-diff.svg
-│   └── ...
-└── ...
+src/assets/icons/
+├── index.ts               # 统一导出（scripts/extend-icons.sh 自动生成）
+└── tools/
+    ├── calculator.svg
+    ├── hash-calculator.svg
+    ├── date-diff.svg
+    └── ...
 ```
 
 ### 7.3 图标使用示例
 
 ```ts
-// src/icons/index.ts
-export const toolIcons: Record<string, string> = {
-  calculator: "/src/icons/tool/calculator.svg",
-  "hash-calculator": "/src/icons/tool/hash-calculator.svg",
-  "date-diff": "/src/icons/tool/date-diff.svg",
-  // ...
-};
+// src/assets/icons/index.ts
+export const toolIcons = {
+  calculator: new URL("./tools/calculator.svg", import.meta.url).href,
+  "hash-calculator": new URL("./tools/hash-calculator.svg", import.meta.url).href,
+  "date-diff": new URL("./tools/date-diff.svg", import.meta.url).href
+} as const;
 ```
 
 ```tsx
-// src/components/ToolIcon.tsx
+// src/features/tools/components/ToolIcon.tsx
 import React from "react";
-import { toolIcons } from "@/icons";
+import { toolIcons } from "@/assets/icons";
 
 interface ToolIconProps {
   name: string;
@@ -369,104 +341,52 @@ export const ToolIcon: React.FC<ToolIconProps> = ({ name, className }) => {
 
 ### 7.4 图标脚本（`extend-icons.sh`）职责
 
-- 根据 `src/tools/**/meta.ts` 中的 `icon` 字段检查 SVG 是否存在。
+- 根据 `src/features/tools/modules/**/meta.ts` 中的 `icon` 字段检查 SVG 是否存在。
 - 可选：从模板复制生成占位图标。
-- 更新 `src/icons/index.ts` 中的 `toolIcons` 映射。
-- 确保脚本位于 `script/extend-icons.sh`，可执行并带注释。
+- 更新 `src/assets/icons/index.ts` 中的 `toolIcons` 映射。
+- 确保脚本位于 `scripts/extend-icons.sh`，可执行并带注释。
 
 脚本的详细实现可单独维护文档，这里仅定义职责和约定。
 
-## 8. 脚本体系（`script/`）
+## 8. 脚本体系（`scripts/`）
 
-所有脚本统一放在 `script/` 目录，并保证可执行与注释完整。
+所有脚本统一放在 `scripts/` 目录，并保持可执行与注释完整，便于快速扩展工具或维护依赖。
 
-### 8.1 `init-opentools.sh`
+### 8.1 `create-tool.sh`
 
-**功能**
-
-- 初始化全新的 OpenTools 项目并创建目录结构。
-- 调用 `npm create vite@latest` 或等效操作。
-- 安装依赖（React / TS / Tailwind 等）。
-- 补全 `.gitignore`、`.editorconfig` 等基础文件。
-- 兼容 Node 18 / npm 9 环境，避免过严的 engines 限制。
-
-**使用示例**
+- 根据传入的 `tool-id`（kebab-case）与可选显示名快速创建新工具目录。
+- 在 `src/features/tools/modules/<tool-id>/` 下生成 `meta.ts` 与 `index.tsx` 模板。
+- 自动导出 `toolId`、`toolMeta`，并预填描述 / 分类 / 关键词，可直接被自动注册系统识别。
+- 若检测到 `scripts/extend-icons.sh`，完成后会自动刷新图标列表。
 
 ```bash
-cd script
-./init-opentools.sh my-open-tools
+./scripts/create-tool.sh date-diff "日期差计算器"
 ```
 
-### 8.2 `extend-opentools.sh`
+### 8.2 `extend-icons.sh`
 
-**功能**
-
-- 在既有的 Vite + React + TS 项目中注入主题系统（context + hook + UI 按钮）。
-- 创建首页卡片布局组件。
-- 初始化 `src/core/registry/`、`src/tools/` 等目录。
-- 更新 `App.tsx` / 路由结构以接入工具首页。
-
-**使用示例**
+- 扫描所有工具目录，保证每个工具在 `src/assets/icons/tools/` 下拥有配套 SVG。
+- 缺失时自动生成统一风格的占位图。
+- 根据最新 SVG 列表生成 `src/assets/icons/index.ts`，供 React 组件直接引用。
 
 ```bash
-cd script
-./extend-opentools.sh
+./scripts/extend-icons.sh
 ```
 
-### 8.3 `create-tool.sh`（加强版）
+### 8.3 `install-deps.sh`
 
-**功能**
-
-- 通过命令行交互或参数自动创建新工具。
-- 输入工具 ID、中文名称、描述、分类、图标 key 等信息。
-- 在 `src/tools/<id>/` 下生成 `index.tsx`、`logic.ts`、`meta.ts`，以及可选的 `types.ts`。
-- 可选：自动触发图标脚本并生成示例界面代码。
-
-**使用示例**
+- 在仓库根目录执行 `npm install`，保持锁文件与依赖一致。
+- 支持透传任何 npm 参数，适用于本地或 CI 环境。
 
 ```bash
-cd script
-./create-tool.sh hash-generator
+./scripts/install-deps.sh --legacy-peer-deps
 ```
 
-### 8.4 `extend-icons.sh`
+### 8.4 `init-scripts-and-commit-template.sh`
 
-**功能**
-
-- 扫描所有工具的 `meta.ts`。
-- 根据 `icon` 字段补全 SVG 文件与 `src/icons/index.ts`。
-- 可生成统一样式、可配置颜色的占位图标。
-
-**使用示例**
-
-```bash
-cd script
-./extend-icons.sh
-```
-
-### 8.5 `init-scripts.sh`（可选）
-
-**功能**
-
-- 初始化 `script/` 目录自身。
-- 生成带 shebang + 注释的脚本模板。
-- 设置执行权限。
-- 创建基础 README 或使用说明。
-
-### 8.6 `install-web-deps.sh`
-
-**功能**
-
-- 快速在 `apps/web` 目录内执行 `npm install`，保持锁文件同步。
-- 支持透传额外参数（如 `--package-lock-only`、指定单个依赖版本）。
-- 在 CI 环境中可复用，避免手动切换目录。
-
-**使用示例**
-
-```bash
-cd script
-./install-web-deps.sh react-router-dom@^6.30.2 --package-lock-only
-```
+- 保障 `scripts/` 目录存在并赋予执行权限。
+- 生成 `.commit-template` 与 `prepare-commit-msg` Git 钩子，统一提交格式。
+- 内容聚焦工具仓库自身的开发流程，不再包含 AI 历史或聊天相关描述。
 
 ## 9. UI 与主题系统
 
@@ -512,12 +432,12 @@ export const ThemeToggle: React.FC = () => {
 - 全部使用 TypeScript。
 - 保持函数与组件职责单一。
 - Hook 命名以 `use` 开头。
-- 统一导入路径别名（如 `@/core`、`@/tools`）。
+- 统一导入路径别名（如 `@/app`、`@/features`、`@/shared`）。
 - 建议使用 ESLint + Prettier 自动格式化。
 
 ### 10.2 组件规范
 
-- UI 组件放在 `src/components/`，避免与某个工具强绑定。
+- UI 组件放在 `src/shared/components/`，避免与某个工具强绑定。
 - 工具内部通用逻辑抽离到 `utils.ts`。
 - 避免在组件中编写复杂逻辑，优先抽出纯函数。
 
@@ -533,18 +453,16 @@ export const ThemeToggle: React.FC = () => {
 
 ### 11.1 初始化项目
 
-1. 在 WSL / 本地终端中进入目标目录。
-2. 运行 `script/init-opentools.sh`。
-3. 如脚本未自动安装依赖，执行 `npm install`。
-4. 启动开发服务器：`npm run dev`。
+1. 在 WSL / 本地终端中进入项目根目录。
+2. 运行 `./scripts/install-deps.sh` 完成依赖安装（或直接执行 `npm install`）。
+3. 启动开发服务器：`npm run dev`。
 
 ### 11.2 新增一个工具
 
 1. 执行脚本：
 
    ```bash
-   cd script
-   ./create-tool.sh hash-generator
+   ./scripts/create-tool.sh hash-generator
    ```
 
 2. 按提示输入工具名称、描述、分类、图标等信息。
@@ -553,12 +471,11 @@ export const ThemeToggle: React.FC = () => {
 
 ### 11.3 更新图标
 
-1. 将新的 SVG 图标放入 `src/icons/tool/`，或仅在 `meta.ts` 中配置 `icon` 字段，由脚本生成占位图标。
+1. 将新的 SVG 图标放入 `src/assets/icons/tools/`，或仅在 `meta.ts` 中配置 `icon` 字段，由脚本生成占位图标。
 2. 执行：
 
    ```bash
-   cd script
-   ./extend-icons.sh
+   ./scripts/extend-icons.sh
    ```
 
 3. 确认首页卡片与工具页面的图标展示正常。
@@ -571,36 +488,13 @@ export const ThemeToggle: React.FC = () => {
 4. 选择当前项目使用的包管理器（npm / pnpm / Yarn）。
 5. 页面会实时展示缺失 / 冗余的依赖列表，并生成对应的安装命令，可一键复制执行。
 
-## 12. AI 历史系统（规划）
+## 12. 路线图（Roadmap）
 
-### 12.1 设计意图
-
-- 将项目的设计过程、脚本生成对话等内容存档。
-- 展示 OpenTools 从 0 到 1 的 AI 辅助历史。
-- 提升项目独特性与可读性，对开源社区友好。
-
-### 12.2 推荐结构
-
-```text
-ai-history/
-├── 2025-11-13-init-opentools.md
-├── 2025-11-13-create-tool-script.md
-├── 2025-11-14-extend-icons.md
-└── ...
-```
-
-内容可包含对话摘要、关键决策点、备选方案以及最终脚本 / 代码片段。
-
-## 13. 路线图（Roadmap）
-
-- [ ] 完成基础项目初始化脚本 `init-opentools.sh`
-- [ ] 完成主题系统与首页卡片 UI
-- [ ] 完成工具自动扫描注册系统
-- [ ] 完成 `create-tool.sh` 加强版脚本（支持自动生成配置与示例代码）
-- [ ] 完成图标生成脚本 `extend-icons.sh`
-- [ ] 实现首批核心工具（计算器、日期差值、哈希计算、时间戳转换等）
+- [ ] 完善 `scripts/create-tool.sh`（校验重复 ID、自动生成逻辑模板）
+- [ ] 完善 `scripts/extend-icons.sh`（支持批量导入 SVG / 自定义主题）
+- [ ] 扩展工具自动扫描注册系统（分类、标签、搜索）
+- [ ] 丰富工具库（计算器、日期差值、哈希、时间戳转换等）
 - [ ] 引入单元测试（如 Vitest）覆盖关键工具逻辑
-- [ ] 完成 AI 历史系统（`ai-history` 目录与展示页面）
 - [ ] 打包为静态站点并部署到公开环境（如 GitHub Pages / Vercel）
 - [ ] 增加多语言支持（中文 / 英文）
 
