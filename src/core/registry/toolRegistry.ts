@@ -6,7 +6,7 @@ interface ToolMetaModule {
   readonly meta?: ToolMeta;
 }
 
-const metaModules = import.meta.glob<ToolMetaModule>("../../tools/**/config.ts", {
+const metaModules = import.meta.glob<ToolMetaModule>("../../tools/**/meta.ts", {
   eager: true
 });
 
@@ -25,7 +25,7 @@ const toEntry = ([modulePath, mod]: [string, ToolMetaModule]): ToolRegistryEntry
     route: meta.route?.startsWith("/") ? meta.route : `/tools/${meta.id}`
   };
 
-  const toolDir = modulePath.replace(/\/config\.tsx?$/, "");
+  const toolDir = modulePath.replace(/[\\/]meta\.tsx?$/, "");
   const componentPath = `${toolDir}/index.tsx`;
   const load = componentModules[componentPath];
 

@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from "react";
-import toolMeta, { toolId } from "./config";
-import { computeHash, initialHashResult, type SupportedHashAlgorithm } from "./utils";
+import React, { useEffect, useMemo, useState } from "react";
+import toolMeta, { toolId } from "./meta";
+import { computeHash, initialHashResult, type SupportedHashAlgorithm } from "./logic";
 
-type HashState = {
-  readonly input: string;
-  readonly uppercase: boolean;
-};
-
-type HashResultMap = Record<SupportedHashAlgorithm, string>;
+export { toolId, toolMeta };
 
 const algorithms: readonly { id: SupportedHashAlgorithm; label: string; hint: string }[] = [
   { id: "MD5", label: "MD5", hint: "通用摘要算法，速度快，适合校验" },
@@ -18,7 +13,12 @@ const algorithms: readonly { id: SupportedHashAlgorithm; label: string; hint: st
 const algorithmOrder = algorithms.map((item) => item.id) as readonly SupportedHashAlgorithm[];
 const createEmptyResults = () => initialHashResult(algorithmOrder);
 
-export { toolId, toolMeta };
+interface HashState {
+  readonly input: string;
+  readonly uppercase: boolean;
+}
+
+type HashResultMap = Record<SupportedHashAlgorithm, string>;
 
 export const HashCalculatorTool: React.FC = () => {
   const [state, setState] = useState<HashState>({ input: "", uppercase: false });
@@ -78,7 +78,7 @@ export const HashCalculatorTool: React.FC = () => {
     };
   }, [state.input]);
 
-  const displayResults = React.useMemo(() => {
+  const displayResults = useMemo(() => {
     return algorithms.reduce<HashResultMap>((acc, item) => {
       acc[item.id] = state.uppercase ? results[item.id]?.toUpperCase() : results[item.id];
       return acc;
