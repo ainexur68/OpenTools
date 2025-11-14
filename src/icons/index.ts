@@ -7,6 +7,7 @@ export const toolIcons = {
   "calculator": new URL("./tool/calculator.svg", import.meta.url).href,
   "date-diff": new URL("./tool/date-diff.svg", import.meta.url).href,
   "hash-calculator": new URL("./tool/hash-calculator.svg", import.meta.url).href,
+  "dependency-checker": new URL("./tool/dependency-checker.svg", import.meta.url).href,
 } as const;
 
 export type ToolIdWithIcon = keyof typeof toolIcons;
