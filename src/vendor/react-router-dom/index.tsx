@@ -83,20 +83,7 @@ const matchRoute = (
     if (remainingSegments.length > 0) {
       return null;
     }
-    const childMatch = route.children
-      ? renderRoutes(route.children, remainingSegments, currentParams)
-      : null;
-    if (childMatch) {
-      remainingSegments = childMatch.remaining;
-    }
-    const childElement = childMatch ? childMatch.element : null;
-    return {
-      element: wrapWithContexts(route.element, childElement, currentParams),
-      remaining: remainingSegments
-    };
-  }
-
-  if (route.path && route.path !== "" && route.path !== "*" && route.path !== "/") {
+  } else if (route.path && route.path !== "" && route.path !== "*" && route.path !== "/") {
     const pathSegments = normalizePath(route.path);
     if (pathSegments.length > remainingSegments.length) {
       return null;
@@ -128,20 +115,17 @@ const matchRoute = (
   const childMatch = route.children
     ? renderRoutes(route.children, remainingSegments, currentParams)
     : null;
+  const nextRemaining = childMatch ? childMatch.remaining : remainingSegments;
 
-  if (childMatch) {
-    remainingSegments = childMatch.remaining;
+  if (nextRemaining.length > 0) {
+    return null;
   }
 
   const childElement = childMatch ? childMatch.element : null;
 
-  if (route.children && !childMatch && remainingSegments.length > 0) {
-    return null;
-  }
-
   return {
     element: wrapWithContexts(route.element, childElement, currentParams),
-    remaining: remainingSegments
+    remaining: nextRemaining
   };
 };
 
