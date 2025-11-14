@@ -3,16 +3,16 @@
 # OpenTools: 新工具模板创建脚本
 #
 # 作用：
-#   1. 在 src/tools/<toolId>/ 下生成基础工具模块（React + TS）
+#   1. 在 src/features/tools/modules/<toolId>/ 下生成基础工具模块（React + TS）
 #   2. 自动生成 meta.ts 和 index.tsx
-#   3. 若存在 script/extend-icons.sh，则自动更新工具图标系统
+#   3. 若存在 scripts/extend-icons.sh，则自动更新工具图标系统
 #
 # 用法：
-#   chmod +x script/create-tool.sh
-#   ./script/create-tool.sh <tool-id> [Tool Display Name]
+#   chmod +x scripts/create-tool.sh
+#   ./scripts/create-tool.sh <tool-id> [Tool Display Name]
 #
 # 示例：
-#   ./script/create-tool.sh date-diff "日期差计算器"
+#   ./scripts/create-tool.sh date-diff "日期差计算器"
 #
 # 注意：
 #   - 请确保此文件使用 LF 换行（避免 /usr/bin/env: 'bash\r' 错误）
@@ -25,7 +25,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-TOOLS_DIR="${PROJECT_ROOT}/src/tools"
+TOOLS_DIR="${PROJECT_ROOT}/src/features/tools/modules"
 
 # -----------------------------------------------------------------------------
 # 工具函数：打印用法
@@ -127,20 +127,24 @@ mkdir -p "${TOOL_DIR}"
 # 生成 meta.ts
 # -----------------------------------------------------------------------------
 cat > "${META_FILE}" <<EOF
-// 此文件由 script/create-tool.sh 自动生成
+// 此文件由 scripts/create-tool.sh 自动生成
 // 如需修改标题、描述或关键词，可在此编辑。
+
+import type { ToolMeta } from "@/features/tools/registry/toolTypes";
 
 export const toolId = "${TOOL_ID}" as const;
 
-export const toolMeta = {
+export const toolMeta: ToolMeta = {
   id: toolId,
-  title: "${DISPLAY_NAME}",
+  name: "${DISPLAY_NAME}",
   description: "TODO: 补充 ${DISPLAY_NAME} 工具的功能说明。",
   keywords: ["${TOOL_ID}", "${DISPLAY_NAME}"],
   category: "general",
-} as const;
+  route: \`/tools/\${toolId}\`,
+  icon: toolId
+};
 
-export type ToolMeta = typeof toolMeta;
+export default toolMeta;
 EOF
 
 # -----------------------------------------------------------------------------
@@ -182,7 +186,7 @@ echo "   - ${META_FILE}"
 echo "   - ${INDEX_FILE}"
 
 # -----------------------------------------------------------------------------
-# 与图标系统联动：如有 script/extend-icons.sh 则自动执行
+# 与图标系统联动：如有 scripts/extend-icons.sh 则自动执行
 # -----------------------------------------------------------------------------
 EXTEND_ICONS_SCRIPT="${SCRIPT_DIR}/extend-icons.sh"
 
@@ -190,9 +194,9 @@ if [[ -x "${EXTEND_ICONS_SCRIPT}" ]]; then
   echo "🔄 [create-tool] 检测到图标扩展脚本，正在更新工具图标系统..."
   "${EXTEND_ICONS_SCRIPT}"
 else
-  echo "ℹ️  [create-tool] 未检测到可执行的 script/extend-icons.sh"
+  echo "ℹ️  [create-tool] 未检测到可执行的 scripts/extend-icons.sh"
   echo "    如需自动生成工具图标及映射，请准备好该脚本后手动执行："
-  echo "      ./script/extend-icons.sh"
+  echo "      ./scripts/extend-icons.sh"
 fi
 
 echo "🎉 [create-tool] 新工具已创建完成：${TOOL_ID}"

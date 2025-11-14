@@ -3,13 +3,13 @@
 # OpenTools: 自动生成工具图标系统
 #
 # 作用：
-#   1. 扫描 src/tools 下的工具目录（每个子目录视为一个 toolId）
+#   1. 扫描 src/features/tools/modules 下的工具目录（每个子目录视为一个 toolId）
 #   2. 为每个 toolId 生成占位 SVG 图标（若不存在）
-#   3. 生成 src/features/tool-icons/index.ts 图标映射文件
+#   3. 生成 src/assets/icons/index.ts 图标映射文件
 #
 # 使用：
-#   chmod +x script/extend-icons.sh
-#   ./script/extend-icons.sh
+#   chmod +x scripts/extend-icons.sh
+#   ./scripts/extend-icons.sh
 #
 # 注意：
 #   - 请确保此文件使用 LF 换行（避免 /usr/bin/env: 'bash\r' 错误）
@@ -22,23 +22,22 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-TOOLS_DIR="${PROJECT_ROOT}/src/tools"
-ICONS_DIR="${PROJECT_ROOT}/src/assets/tool-icons"
-ICONS_TS_DIR="${PROJECT_ROOT}/src/features/tool-icons"
-ICONS_TS_FILE="${ICONS_TS_DIR}/index.ts"
+TOOLS_DIR="${PROJECT_ROOT}/src/features/tools/modules"
+ICONS_DIR="${PROJECT_ROOT}/src/assets/icons/tools"
+ICONS_TS_FILE="${PROJECT_ROOT}/src/assets/icons/index.ts"
 
 echo "🧩 [extend-icons] Project root: ${PROJECT_ROOT}"
 
 # 确保基础目录存在
 mkdir -p "${ICONS_DIR}"
-mkdir -p "${ICONS_TS_DIR}"
+mkdir -p "${PROJECT_ROOT}/src/assets/icons"
 
 if [[ ! -d "${TOOLS_DIR}" ]]; then
   echo "⚠️  [extend-icons] 工具目录不存在：${TOOLS_DIR}"
   echo "    将仍然生成空的图标映射文件。"
 fi
 
-# 收集 toolId（即 src/tools 下的一级子目录名）
+# 收集 toolId（即 src/features/tools/modules 下的一级子目录名）
 tool_ids=()
 if [[ -d "${TOOLS_DIR}" ]]; then
   while IFS= read -r -d '' dir; do
@@ -89,7 +88,7 @@ echo "📝 [extend-icons] 生成 TypeScript 图标映射：${ICONS_TS_FILE}"
 
 {
   echo "/*"
-  echo " * 此文件由 script/extend-icons.sh 自动生成，请不要手动修改。"
+  echo " * 此文件由 scripts/extend-icons.sh 自动生成，请不要手动修改。"
   echo " * 重新执行脚本会覆盖此文件。"
   echo " */"
   echo
@@ -98,7 +97,7 @@ echo "📝 [extend-icons] 生成 TypeScript 图标映射：${ICONS_TS_FILE}"
   echo "export const toolIcons = {"
   if ((${#tool_ids[@]} > 0)); then
     for tool_id in "${tool_ids[@]}"; do
-      echo "  \"${tool_id}\": new URL(\"../../assets/tool-icons/${tool_id}.svg\", import.meta.url).href,"
+      echo "  \"${tool_id}\": new URL(\"./tools/${tool_id}.svg\", import.meta.url).href,"
     done
   fi
   echo "} as const;"

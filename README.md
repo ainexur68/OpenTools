@@ -161,7 +161,7 @@ src/tools/hash-calculator/
 
 ```ts
 // src/tools/hash-calculator/meta.ts
-import type { ToolMeta } from "@/core/registry/toolTypes";
+import type { ToolMeta } from "@/features/tools/registry/toolTypes";
 
 export const toolId = "hash-calculator" as const;
 
@@ -303,7 +303,7 @@ export const toolComponents = componentModules;
 ```tsx
 // src/pages/Home.tsx
 import React from "react";
-import { toolMetaList } from "@/core/registry/toolRegistry";
+import { toolMetaList } from "@/features/tools/registry/toolRegistry";
 import { ToolCard } from "@/components/ToolCard";
 
 export const Home: React.FC = () => {
@@ -493,7 +493,7 @@ export const useTheme = () => useContext(ThemeContext);
 ```tsx
 // src/components/ThemeToggle.tsx
 import React from "react";
-import { useTheme } from "@/core/theme/useTheme";
+import { useTheme } from "@/shared/theme/useTheme";
 
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
