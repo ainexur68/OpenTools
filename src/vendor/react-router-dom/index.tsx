@@ -83,9 +83,13 @@ const matchRoute = (
     if (remainingSegments.length > 0) {
       return null;
     }
-    const childElement = route.children
+    const childMatch = route.children
       ? renderRoutes(route.children, remainingSegments, currentParams)
       : null;
+    if (childMatch) {
+      remainingSegments = childMatch.remaining;
+    }
+    const childElement = childMatch ? childMatch.element : null;
     return {
       element: wrapWithContexts(route.element, childElement, currentParams),
       remaining: remainingSegments
@@ -121,11 +125,17 @@ const matchRoute = (
     remainingSegments = [];
   }
 
-  const childElement = route.children
+  const childMatch = route.children
     ? renderRoutes(route.children, remainingSegments, currentParams)
     : null;
 
-  if (route.children && !childElement && remainingSegments.length > 0) {
+  if (childMatch) {
+    remainingSegments = childMatch.remaining;
+  }
+
+  const childElement = childMatch ? childMatch.element : null;
+
+  if (route.children && !childMatch && remainingSegments.length > 0) {
     return null;
   }
 
@@ -139,7 +149,7 @@ const renderRoutes = (
   routes: readonly RouteObject[],
   segments: readonly string[],
   params: Readonly<Record<string, string>>
-): React.ReactNode => {
+): MatchResult | null => {
   for (const route of routes) {
     const match = matchRoute(route, segments, params);
     if (match) {
@@ -147,7 +157,7 @@ const renderRoutes = (
         // there are unmatched segments that no child consumed
         continue;
       }
-      return match.element;
+      return match;
     }
   }
   return null;
@@ -228,7 +238,8 @@ export const RouterProvider: React.FC<RouterProviderProps> = ({ router }) => {
   );
 
   const element = useMemo(() => {
-    return renderRoutes(routesRef.current, normalizePath(location), {});
+    const match = renderRoutes(routesRef.current, normalizePath(location), {});
+    return match ? match.element : null;
   }, [location]);
 
   return (
