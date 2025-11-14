@@ -1,66 +1,18 @@
 import React, { useMemo, useState } from "react";
-import toolMeta, { toolId } from "./config";
-
-type CalculatorState = {
-  readonly first: string;
-  readonly second: string;
-};
-
-type CalculatorResult = {
-  readonly sum: number;
-  readonly difference: number;
-  readonly product: number;
-  readonly quotient: number | null;
-  readonly remainder: number | null;
-  readonly power: number | null;
-};
-
-const parseInput = (value: string): number | null => {
-  if (value.trim() === "") {
-    return null;
-  }
-
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-const computeResults = (state: CalculatorState): CalculatorResult | null => {
-  const first = parseInput(state.first);
-  const second = parseInput(state.second);
-
-  if (first === null || second === null) {
-    return null;
-  }
-
-  const quotient = second === 0 ? null : first / second;
-
-  return {
-    sum: first + second,
-    difference: first - second,
-    product: first * second,
-    quotient,
-    remainder: second === 0 ? null : first % second,
-    power: first === 0 && second === 0 ? null : Math.pow(first, second)
-  };
-};
-
-const formatNumber = (value: number): string => {
-  if (!Number.isFinite(value)) {
-    return "结果超出可表示范围";
-  }
-
-  return value.toString();
-};
+import toolMeta, { toolId } from "./meta";
+import {
+  computeCalculatorResults,
+  formatNumericResult,
+  initialCalculatorState,
+  type CalculatorState
+} from "./logic";
 
 export { toolId, toolMeta };
 
 export const CalculatorTool: React.FC = () => {
-  const [state, setState] = useState<CalculatorState>({
-    first: "",
-    second: ""
-  });
+  const [state, setState] = useState<CalculatorState>(initialCalculatorState);
 
-  const result = useMemo(() => computeResults(state), [state]);
+  const result = useMemo(() => computeCalculatorResults(state), [state]);
 
   const updateField = (field: keyof CalculatorState) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.target.value;
@@ -108,12 +60,18 @@ export const CalculatorTool: React.FC = () => {
         </header>
         {result ? (
           <dl className="grid gap-3 sm:grid-cols-2">
-            <ResultItem label="加法" value={formatNumber(result.sum)} />
-            <ResultItem label="减法" value={formatNumber(result.difference)} />
-            <ResultItem label="乘法" value={formatNumber(result.product)} />
-            <ResultItem label="除法" value={result.quotient === null ? "无法计算（除数为 0）" : formatNumber(result.quotient)} />
-            <ResultItem label="取余" value={result.remainder === null ? "无法计算（除数为 0）" : formatNumber(result.remainder)} />
-            <ResultItem label="指数" value={result.power === null ? "无法计算" : formatNumber(result.power)} />
+            <ResultItem label="加法" value={formatNumericResult(result.sum)} />
+            <ResultItem label="减法" value={formatNumericResult(result.difference)} />
+            <ResultItem label="乘法" value={formatNumericResult(result.product)} />
+            <ResultItem
+              label="除法"
+              value={result.quotient === null ? "无法计算（除数为 0）" : formatNumericResult(result.quotient)}
+            />
+            <ResultItem
+              label="取余"
+              value={result.remainder === null ? "无法计算（除数为 0）" : formatNumericResult(result.remainder)}
+            />
+            <ResultItem label="指数" value={result.power === null ? "无法计算" : formatNumericResult(result.power)} />
           </dl>
         ) : (
           <p className="text-xs">请输入两个有效数字以查看计算结果。</p>

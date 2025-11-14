@@ -36,7 +36,9 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
   - 经纬度与其他坐标系（如度分秒）互相转换
 - 其他
   - UUID 生成
-  - 随机密码生成
+- 随机密码生成
+- 项目维护类
+  - 依赖差异检测器（快速识别缺失依赖并生成安装命令）
 
 ### 2.2 核心特性
 
@@ -119,15 +121,21 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 │   │   └── index.tsx                     # 路由配置
 │   └── tools/
 │       ├── calculator/
-│       │   ├── config.ts                 # 工具元数据
-│       │   └── index.tsx                 # 工具主组件
+│       │   ├── index.tsx                 # 工具主组件
+│       │   ├── logic.ts                  # 业务逻辑 / 纯函数
+│       │   └── meta.ts                   # 工具元数据
 │       ├── date-diff/
-│       │   ├── config.ts                 # 工具元数据
-│       │   └── index.tsx                 # 工具主组件
+│       │   ├── index.tsx
+│       │   ├── logic.ts
+│       │   └── meta.ts
+│       ├── dependency-checker/
+│       │   ├── index.tsx
+│       │   ├── logic.ts
+│       │   └── meta.ts
 │       └── hash-calculator/
-│           ├── config.ts                 # 工具元数据
-│           ├── index.tsx                 # 工具主组件
-│           └── utils.ts                  # 哈希算法实现
+│           ├── index.tsx
+│           ├── logic.ts
+│           └── meta.ts
 └── ...
 ```
 ## 5. 工具模块规范
@@ -143,27 +151,59 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 
 ```text
 src/tools/hash-calculator/
-├── index.tsx       # 工具主组件
-├── config.ts       # 工具元数据
-├── types.ts        # 工具特有类型定义（可选）
-└── utils.ts        # 工具内部逻辑（可选）
+├── index.tsx       # 工具主组件（只负责 UI）
+├── logic.ts        # 核心逻辑（纯函数，便于复用与测试）
+├── meta.ts         # 工具元数据（被自动注册系统读取）
+└── types.ts        # 工具特有类型定义（可选）
 ```
 
-**`config.ts` 示例**
+**`meta.ts` 示例**
 
 ```ts
-// src/tools/hash-calculator/config.ts
+// src/tools/hash-calculator/meta.ts
 import type { ToolMeta } from "@/core/registry/toolTypes";
 
-export const hashCalculatorMeta: ToolMeta = {
-  id: "hash-calculator",
+export const toolId = "hash-calculator" as const;
+
+export const toolMeta: ToolMeta = {
+  id: toolId,
   name: "哈希计算器",
   description: "输入任意文本，计算 MD5 / SHA 系列哈希值。",
   category: "编码与安全",
-  route: "/tools/hash-calculator",
-  icon: "hash-calculator", // 对应图标系统中的 key
+  route: `/tools/${toolId}`,
+  icon: toolId,
   keywords: ["hash", "md5", "sha", "加密", "摘要"],
   order: 10,
+};
+
+export default toolMeta;
+```
+
+**`logic.ts` 示例**
+
+```ts
+// src/tools/hash-calculator/logic.ts
+export type SupportedHashAlgorithm = "MD5" | "SHA-1" | "SHA-256";
+
+export const initialHashResult = <T extends readonly SupportedHashAlgorithm[]>(algorithms: T) => {
+  return algorithms.reduce<Record<T[number], string>>((acc, item) => {
+    acc[item] = "";
+    return acc;
+  }, {} as Record<T[number], string>);
+};
+
+export const computeHash = async (algorithm: SupportedHashAlgorithm, message: string): Promise<string> => {
+  if (algorithm === "MD5") {
+    // 这里可实现纯前端 MD5，或调用 WebAssembly 模块
+    throw new Error("请在 UI 中提供 MD5 的具体实现");
+  }
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const buffer = await crypto.subtle.digest(algorithm, data);
+  return Array.from(new Uint8Array(buffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 };
 ```
 
@@ -231,7 +271,7 @@ export interface ToolMeta {
 
 ### 6.1 设计目标
 
-- 新增工具时只需创建目录与 `config.ts`、`index.tsx` 文件。
+- 新增工具时只需创建目录与 `meta.ts`、`logic.ts`、`index.tsx` 文件。
 - 无需手动修改 JSON 或中心注册文件。
 - 首页卡片、路由、工具列表从统一的 registry 获取。
 
@@ -241,26 +281,22 @@ export interface ToolMeta {
 // src/core/registry/toolRegistry.ts
 import type { ToolMeta } from "./toolTypes";
 
-const metaModules = import.meta.glob<{
-  readonly [key: string]: unknown;
-}>("/src/tools/**/config.ts", { eager: true });
+const metaModules = import.meta.glob<{ default?: ToolMeta; toolMeta?: ToolMeta }>(
+  "/src/tools/**/meta.ts",
+  { eager: true }
+);
 
 const componentModules = import.meta.glob("/src/tools/**/index.tsx");
 
 export const toolMetaList: ToolMeta[] = Object.values(metaModules)
-  .map((mod: any) => {
-    // 每个 config.ts 需要导出一个 `xxxMeta` 对象
-    const meta: ToolMeta | undefined =
-      mod.default || Object.values(mod).find((v) => v && v.id);
-    return meta;
-  })
-  .filter(Boolean)
-  .sort((a: any, b: any) => (a.order ?? 9999) - (b.order ?? 9999));
+  .map((mod) => mod.toolMeta ?? mod.default)
+  .filter((meta): meta is ToolMeta => Boolean(meta))
+  .sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
 
 export const toolComponents = componentModules;
 ```
 
-**约定**：每个 `config.ts` 必须导出一个 `ToolMeta` 对象，可使用 `export default` 或具名导出。
+**约定**：每个 `meta.ts` 必须导出一个 `ToolMeta` 对象，可使用 `export default` 或具名导出。
 
 ### 6.3 在首页使用工具列表
 
@@ -333,7 +369,7 @@ export const ToolIcon: React.FC<ToolIconProps> = ({ name, className }) => {
 
 ### 7.4 图标脚本（`extend-icons.sh`）职责
 
-- 根据 `src/tools/**/config.ts` 中的 `icon` 字段检查 SVG 是否存在。
+- 根据 `src/tools/**/meta.ts` 中的 `icon` 字段检查 SVG 是否存在。
 - 可选：从模板复制生成占位图标。
 - 更新 `src/icons/index.ts` 中的 `toolIcons` 映射。
 - 确保脚本位于 `script/extend-icons.sh`，可执行并带注释。
@@ -383,7 +419,7 @@ cd script
 
 - 通过命令行交互或参数自动创建新工具。
 - 输入工具 ID、中文名称、描述、分类、图标 key 等信息。
-- 在 `src/tools/<id>/` 下生成 `index.tsx`、`config.ts`，以及可选的 `types.ts`、`utils.ts`。
+- 在 `src/tools/<id>/` 下生成 `index.tsx`、`logic.ts`、`meta.ts`，以及可选的 `types.ts`。
 - 可选：自动触发图标脚本并生成示例界面代码。
 
 **使用示例**
@@ -397,7 +433,7 @@ cd script
 
 **功能**
 
-- 扫描所有工具的 `config.ts`。
+- 扫描所有工具的 `meta.ts`。
 - 根据 `icon` 字段补全 SVG 文件与 `src/icons/index.ts`。
 - 可生成统一样式、可配置颜色的占位图标。
 
@@ -416,6 +452,21 @@ cd script
 - 生成带 shebang + 注释的脚本模板。
 - 设置执行权限。
 - 创建基础 README 或使用说明。
+
+### 8.6 `install-web-deps.sh`
+
+**功能**
+
+- 快速在 `apps/web` 目录内执行 `npm install`，保持锁文件同步。
+- 支持透传额外参数（如 `--package-lock-only`、指定单个依赖版本）。
+- 在 CI 环境中可复用，避免手动切换目录。
+
+**使用示例**
+
+```bash
+cd script
+./install-web-deps.sh react-router-dom@^6.30.2 --package-lock-only
+```
 
 ## 9. UI 与主题系统
 
@@ -502,7 +553,7 @@ export const ThemeToggle: React.FC = () => {
 
 ### 11.3 更新图标
 
-1. 将新的 SVG 图标放入 `src/icons/tool/`，或仅在 `config.ts` 中配置 `icon` 字段，由脚本生成占位图标。
+1. 将新的 SVG 图标放入 `src/icons/tool/`，或仅在 `meta.ts` 中配置 `icon` 字段，由脚本生成占位图标。
 2. 执行：
 
    ```bash
@@ -511,6 +562,14 @@ export const ThemeToggle: React.FC = () => {
    ```
 
 3. 确认首页卡片与工具页面的图标展示正常。
+
+### 11.4 使用「依赖差异检测器」
+
+1. 打开浏览器访问首页，点击「依赖差异检测器」工具卡片进入页面。
+2. 在左侧输入框粘贴 `package.json` 中的 `dependencies`、`devDependencies`（支持 JSON 或逐行 `name@version` 格式）。
+3. 在右侧输入框粘贴实际已安装的依赖列表（可从 `npm ls` 或 lockfile 中复制，亦可留空）。
+4. 选择当前项目使用的包管理器（npm / pnpm / Yarn）。
+5. 页面会实时展示缺失 / 冗余的依赖列表，并生成对应的安装命令，可一键复制执行。
 
 ## 12. AI 历史系统（规划）
 

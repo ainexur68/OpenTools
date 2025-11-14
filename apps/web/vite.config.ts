@@ -7,7 +7,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "../../src"),
-      "#app": path.resolve(__dirname, "./src")
+      "#app": path.resolve(__dirname, "./src"),
+      "react-router-dom": path.resolve(__dirname, "../../src/vendor/react-router-dom")
     }
   },
   server: {
