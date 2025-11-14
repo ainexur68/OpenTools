@@ -118,9 +118,16 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 │   ├── router/
 │   │   └── index.tsx                     # 路由配置
 │   └── tools/
-│       └── date-diff/
+│       ├── calculator/
+│       │   ├── config.ts                 # 工具元数据
+│       │   └── index.tsx                 # 工具主组件
+│       ├── date-diff/
+│       │   ├── config.ts                 # 工具元数据
+│       │   └── index.tsx                 # 工具主组件
+│       └── hash-calculator/
 │           ├── config.ts                 # 工具元数据
-│           └── index.tsx                 # 工具主组件
+│           ├── index.tsx                 # 工具主组件
+│           └── utils.ts                  # 哈希算法实现
 └── ...
 ```
 ## 5. 工具模块规范
@@ -128,14 +135,14 @@ OpenTools 是一个基于 **Vite + React + TypeScript** 的前端工具集合项
 ### 5.1 模块目录与命名
 
 - 每个工具是 `src/tools/<tool-id>/` 下的独立目录。
-- `<tool-id>` 使用 kebab-case，例如 `date-diff`、`hash-generator`、`geo-coordinate-convert`。
+- `<tool-id>` 使用 kebab-case，例如 `date-diff`、`hash-calculator`、`geo-coordinate-convert`。
 
 ### 5.2 工具基础文件
 
-以 `src/tools/hash-generator/` 为例：
+以 `src/tools/hash-calculator/` 为例：
 
 ```text
-src/tools/hash-generator/
+src/tools/hash-calculator/
 ├── index.tsx       # 工具主组件
 ├── config.ts       # 工具元数据
 ├── types.ts        # 工具特有类型定义（可选）
@@ -145,16 +152,16 @@ src/tools/hash-generator/
 **`config.ts` 示例**
 
 ```ts
-// src/tools/hash-generator/config.ts
+// src/tools/hash-calculator/config.ts
 import type { ToolMeta } from "@/core/registry/toolTypes";
 
-export const hashGeneratorMeta: ToolMeta = {
-  id: "hash-generator",
+export const hashCalculatorMeta: ToolMeta = {
+  id: "hash-calculator",
   name: "哈希计算器",
   description: "输入任意文本，计算 MD5 / SHA 系列哈希值。",
   category: "编码与安全",
-  route: "/tools/hash-generator",
-  icon: "hash", // 对应图标系统中的 key
+  route: "/tools/hash-calculator",
+  icon: "hash-calculator", // 对应图标系统中的 key
   keywords: ["hash", "md5", "sha", "加密", "摘要"],
   order: 10,
 };
@@ -163,10 +170,10 @@ export const hashGeneratorMeta: ToolMeta = {
 **`index.tsx` 示例**
 
 ```tsx
-// src/tools/hash-generator/index.tsx
+// src/tools/hash-calculator/index.tsx
 import React, { useState } from "react";
 
-export const HashGenerator: React.FC = () => {
+export const HashCalculator: React.FC = () => {
   const [input, setInput] = useState("");
   const [md5, setMd5] = useState("");
   const [sha1, setSha1] = useState("");
@@ -289,7 +296,7 @@ src/icons/
 ├── index.ts               # 统一导出
 ├── tool/
 │   ├── calculator.svg
-│   ├── hash.svg
+│   ├── hash-calculator.svg
 │   ├── date-diff.svg
 │   └── ...
 └── ...
@@ -301,7 +308,7 @@ src/icons/
 // src/icons/index.ts
 export const toolIcons: Record<string, string> = {
   calculator: "/src/icons/tool/calculator.svg",
-  hash: "/src/icons/tool/hash.svg",
+  "hash-calculator": "/src/icons/tool/hash-calculator.svg",
   "date-diff": "/src/icons/tool/date-diff.svg",
   // ...
 };
