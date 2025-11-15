@@ -3,11 +3,15 @@
  * 重新执行脚本会覆盖此文件。
  */
 
+// Vite + TypeScript 图标映射
+
 export const toolIcons = {
+  "base64-converter": new URL("./tools/base64-converter.svg", import.meta.url).href,
   "calculator": new URL("./tools/calculator.svg", import.meta.url).href,
   "date-diff": new URL("./tools/date-diff.svg", import.meta.url).href,
+  "dependency-checker": new URL("./tools/dependency-checker.svg", import.meta.url).href,
   "hash-calculator": new URL("./tools/hash-calculator.svg", import.meta.url).href,
-  "dependency-checker": new URL("./tools/dependency-checker.svg", import.meta.url).href
+  "url-encoder": new URL("./tools/url-encoder.svg", import.meta.url).href,
 } as const;
 
 export type ToolIdWithIcon = keyof typeof toolIcons;
