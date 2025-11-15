@@ -11,16 +11,21 @@ const NotFound: React.FC = () => (
   </div>
 );
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <RootLayout />,
-    children: [
-      { index: true, element: <ToolHubPage /> },
-      { path: "tools/:toolId", element: <ToolLayout /> },
-      { path: "*", element: <NotFound /> }
-    ]
-  }
-]);
+const basename = typeof window === "undefined" ? "/" : new URL(import.meta.env.BASE_URL, window.location.href).pathname;
+
+export const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <RootLayout />,
+      children: [
+        { index: true, element: <ToolHubPage /> },
+        { path: "tools/:toolId", element: <ToolLayout /> },
+        { path: "*", element: <NotFound /> }
+      ]
+    }
+  ],
+  { basename }
+);
 
 export default router;
