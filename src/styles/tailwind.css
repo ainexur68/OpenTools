@@ -2,23 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light dark;
-}
+@layer base {
+  :root {
+    font-family: "Space Grotesk", "Inter", "Pretendard Variable", "SF Pro Display", system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: light;
+  }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Inter", "SF Pro Display", "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-image: radial-gradient(circle at 10% 20%, rgba(190, 220, 255, 0.6) 0%, transparent 40%),
+      radial-gradient(circle at 80% 0%, rgba(214, 187, 255, 0.5) 0%, transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(240, 240, 255, 0.65) 0%, transparent 50%),
+      linear-gradient(135deg, #fdfbff 0%, #eef2ff 60%, #fdfbff 100%);
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+  }
 
-* {
-  box-sizing: border-box;
+  body.dark {
+    background-image: radial-gradient(circle at 8% 20%, rgba(76, 84, 112, 0.6) 0%, transparent 35%),
+      radial-gradient(circle at 70% -10%, rgba(42, 50, 88, 0.45) 0%, transparent 35%),
+      radial-gradient(circle at 50% 100%, rgba(19, 26, 53, 0.55) 0%, transparent 55%),
+      linear-gradient(135deg, #060913 0%, #0f172a 65%, #05070f 100%);
+    color: #f8fafc;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }

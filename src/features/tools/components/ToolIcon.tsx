@@ -11,7 +11,7 @@ export const ToolIcon: React.FC<ToolIconProps> = ({ name, className, alt, ...res
   if (!src) {
     return (
       <div
-        className={`flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-slate-300 text-xs font-semibold uppercase text-slate-400 ${className ?? ""}`}
+        className={`flex items-center justify-center rounded-lg bg-slate-100/80 text-[0.65rem] font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-200 ${className ?? ""}`}
       >
         {name.slice(0, 2)}
       </div>
